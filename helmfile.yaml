@@ -2,4 +2,5 @@ releases:
 - name: sleep
   namespace: default
   chart: sleep/
+  atomic: true
   wait: true

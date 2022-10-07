@@ -2,11 +2,15 @@
 
 set -ex -o pipefail
 
-helmfile apply &
+~/src/helmfile/helmfile version
+~/src/helmfile/helmfile apply &
+
+sleep 10
 
 until pgrep -f "helm upgrade"; do sleep 10; done
 
-kill -TERM %1
+kill -INT %1
+wait %1
 
 pgrep -f "helm upgrade" | xargs ps -fp
 
