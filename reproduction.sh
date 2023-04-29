@@ -2,15 +2,27 @@
 
 set -ex -o pipefail
 
-~/src/helmfile/helmfile version
-~/src/helmfile/helmfile apply &
+HELMFILE_BIN=${HELMFILE_BIN:-~/p/helmfile/helmfile}
 
-sleep 10
+${HELMFILE_BIN} version
+${HELMFILE_BIN} destroy || true
 
-until pgrep -f "helm upgrade"; do sleep 10; done
+pids=()
+${HELMFILE_BIN} apply &
+pids+=($!)
+bash -c "echo waiting 10s before killing helm; sleep 10; echo killing helm; pkill helm" &
+pids+=($!)
+
+sleep 1
+
+until pgrep -f "helm upgrade"; do sleep 1; done
+
+echo "detected helm upgrade running"
+echo "interrupting helm upgrade"
 
 kill -INT %1
-wait %1
+#wait %1
+wait "${pids[@]}"
 
 pgrep -f "helm upgrade" | xargs ps -fp
 

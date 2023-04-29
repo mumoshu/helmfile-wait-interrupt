@@ -12,6 +12,10 @@ spec:
       labels:
         app: sleep
     spec:
+      initContainers:
+      - name: init
+        image: busybox:1.28
+        command: ['sh', '-c', 'sleep 30']
       containers:
         - name: sleep
           command: ["bash", "-c", "sleep 900"]
